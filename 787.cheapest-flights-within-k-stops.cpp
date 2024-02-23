@@ -7,48 +7,36 @@
 // @lc code=start
 class Solution {
 public:
-    struct node{
-        int node;
-        int weight;
-        int step;
-    }head, tmp;
     int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
-        vector<vector<node>> edges;
-        edges.resize(n);
-        for(int j=0;j<flights.size();j++){
-            tmp.node = flights[j][1];
-            tmp.weight = flights[j][2];
-            edges[flights[j][0]].push_back(tmp);
+        vector<int> dist(n + 1, INT_MAX);
+        vector<pair<int, int>> graph[n + 1];
+        for(auto &it : flights){
+            graph[it[0]].push_back({it[1], it[2]});
         }
-        int ans = 2147483647;
-        queue<node> pq;
-        tmp.node = src;
-        tmp.weight = 0;
-        tmp.step = -1;
-        pq.push(tmp);
-        vector<int> dis(n, 2147483647);
-        dis[src] = 0;
-        while(!pq.empty()){
-            head = pq.front();
-            pq.pop();
-            if(head.step>k) continue;
-            if(head.node == dst){
-                ans = min(ans, head.weight);
-                continue;
+
+        dist[src] = 0;
+        int step = 0;
+        queue<pair<int, int>> q;
+        q.push({src, 0});
+        while(!q.empty() && step <= k){
+            int size = q.size();
+            while(size--){
+                int now = q.front().first;
+                int nowDist = q.front().second;
+                for(auto it : graph[now]){
+                    int nxt = it.first;
+                    int nxtDist = it.second + nowDist;
+                    if(nxtDist < dist[nxt]){
+                        dist[nxt] = nxtDist;
+                        q.push({nxt, nxtDist});
+                    }
+                }
+                q.pop();
             }
-            if(dis[head.node] < head.weight) continue;
-            dis[head.node] = head.weight;
-            for(int i=0;i<edges[head.node].size();i++){
-                tmp.node = edges[head.node][i].node;
-                tmp.weight = head.weight + edges[head.node][i].weight;
-                tmp.step = head.step + 1;
-                pq.push(tmp);
-            }
+            step++;
         }
-        if(ans == 2147483647){
-            return -1;
-        }
-        return ans;
+        if(dist[dst] == INT_MAX) dist[dst] = -1;
+        return dist[dst];
     }
 };
 // @lc code=end
