@@ -16,16 +16,14 @@
 class Solution {
 public:
     bool hasCycle(ListNode *head) {
-        if(head == NULL){
-            return false;
+        while(head){
+            if(head->val == INT_MAX){
+                return true;
+            }
+            head->val = INT_MAX;
+            head = head->next;
         }
-        else if(head->val == 1000000){
-            return true;
-        }
-        else{
-            head->val = 1000000;
-            return hasCycle(head->next);
-        }
+        return false;
     }
 };
 
